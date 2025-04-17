@@ -1,2 +1,2 @@
 # medical-device-rag-system
-Answers questions about compliance requirements and approval pathways
+A RAG System that answers questions about compliance requirements and approval pathways
