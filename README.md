@@ -1,2 +1,2 @@
 # medical-device-rag-system
-A RAG System that answers questions about compliance requirements and approval pathways
+A Retrieval-Augmented Generation (RAG) system for FDA medical device regulations. It answers questions about compliance requirements and approval pathways
