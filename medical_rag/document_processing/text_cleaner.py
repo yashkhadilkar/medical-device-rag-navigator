@@ -1,4 +1,4 @@
-import re 
+import re
 import logging
 import unicodedata
 import string
@@ -10,9 +10,12 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 try:
-    nltk.data.find('tokenizers/punkt')
-    nltk.data.find('corpora/stopwords')
+    sent_tokenize("test sentence")
+    stopwords.words('english')
 except LookupError:
     nltk.download('punkt')
     nltk.download('stopwords')
