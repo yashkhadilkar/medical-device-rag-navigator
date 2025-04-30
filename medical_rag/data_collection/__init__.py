@@ -1,5 +1,5 @@
 """
-Data collection package
+Data collection package for Medical Device RAG System
 
 This package provides modules for collecting regulatory documents and 
 data from FDA and other sources in a storage-efficient manner.
