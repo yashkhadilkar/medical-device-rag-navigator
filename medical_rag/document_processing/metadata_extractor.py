@@ -4,30 +4,48 @@ import datetime
 from typing import List, Dict, Any, Optional, Set, Tuple
 from pathlib import Path
 import json
-import spacy
-import dateutil.parser
-from PyMuPDF import fitz
-import os
 import hashlib
+import os
 
+try:
+    import dateutil.parser
+    DATEUTIL_AVAILABLE = True
+except ImportError:
+    DATEUTIL_AVAILABLE = False
+    logging.warning("dateutil not available. Install with: pip install python-dateutil")
+
+try:
+    import fitz 
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    PYMUPDF_AVAILABLE = False
+    logging.warning("PyMuPDF not available. Install with: pip install pymupdf")
+
+try:
+    import spacy
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
+    logging.warning("spaCy not available. Install with: pip install spacy")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class MetadataExtractor:
     """Extract metadata from regulatory documents to enhance search and retrieval.
+    Storage-efficient version that focuses only on essential metadata.
     """
     
-    def __init__(self, use_nlp: bool = True, regulatory_terms_file: Optional[str] = None):
+    def __init__(self, use_nlp: bool = False, regulatory_terms_file: Optional[str] = None):
         """Initialize the metadata extractor.
 
         Args:
-            use_nlp: Whether to use NLP for entity extraction
+            use_nlp: Whether to use NLP for entity extraction (default False to save resources)
             regulatory_terms_file: Path to JSON file with regulatory terms
         """
-        self.use_nlp = use_nlp
+        self.use_nlp = use_nlp and SPACY_AVAILABLE
         
-        if use_nlp:
+        if self.use_nlp:
             try:
                 self.nlp = spacy.load("en_core_web_sm")
                 logger.info("Loaded spaCy model for entity extraction")
@@ -38,15 +56,14 @@ class MetadataExtractor:
                 self.nlp = None
         else:
             self.nlp = None
-        
-        self.regulatory_terms = self._load_regulatory_terms(regulatory_terms_file)
-        
+
+        self.regulatory_terms = self._load_minimal_terms(regulatory_terms_file)
+
         self.patterns = {
             "document_date": [
                 r'(?:Date of Issuance|Publication Date|Issued on|Published on):\s*(\w+ \d{1,2},? \d{4})',
                 r'(\w+ \d{1,2},? \d{4})',
-                r'(\d{1,2}/\d{1,2}/\d{4})',
-                r'(\d{4}-\d{2}-\d{2})'
+                r'(\d{1,2}/\d{1,2}/\d{4})'
             ],
             "document_number": [
                 r'Document Number[:\s]+([A-Z0-9\-\.]+)',
@@ -55,108 +72,60 @@ class MetadataExtractor:
             ],
             "document_type": [
                 r'(Guidance for Industry)',
-                r'(Guidance for Industry and Food and Drug Administration Staff)',
                 r'(Draft Guidance)',
-                r'(Final Guidance)',
-                r'(Technical Considerations)'
+                r'(Final Guidance)'
             ],
             "cfr_references": [
-                r'(\d+\s*CFR\s*(?:Part)?\s*\d+(?:\.\d+)?)',
-                r'(Title \d+,? Part \d+(?:\.\d+)?)'
+                r'(\d+\s*CFR\s*(?:Part)?\s*\d+(?:\.\d+)?)'
             ],
             "iso_references": [
-                r'(ISO\s*\d+(?:-\d+)?:\d+)',
-                r'(International Standard\s*\d+(?:-\d+)?:\d+)'
+                r'(ISO\s*\d+(?:-\d+)?:\d+)'
             ]
         }
         
-    def _load_regulatory_terms(self, filename: Optional[str]) -> Dict[str, List[str]]:
-        """Load regulatory terms from a JSON file.
+    def _load_minimal_terms(self, filename: Optional[str]) -> Dict[str, List[str]]:
+        """Load minimal set of regulatory terms.
 
         Args:
-            filename: Path to JSON file with terms.
+            filename: Path to JSON file with terms (optional)
 
         Returns:
             Dictionary of term categories and terms
         """
-        if not filename or not os.path.exists(filename):
-            return {
-                "device_classifications": ["Class I", "Class II", "Class III"],
-                "submission_types": ["510(k)", "PMA", "De Novo", "HDE", "IDE"],
-                "standards": ["ISO", "IEC", "ASTM", "ANSI"],
-                "regulatory_bodies": ["FDA", "CDRH", "CBER", "CDER", "EMA", "PMDA", "Health Canada"]
-            }
+        minimal_terms = {
+            "device_classifications": ["Class I", "Class II", "Class III"],
+            "submission_types": ["510(k)", "PMA", "De Novo"],
+            "regulatory_bodies": ["FDA", "CDRH"]
+        }
         
-        try:
-            with open(filename, 'r', encoding='utf-8') as f:
-                terms = json.load(f)
-            logger.info(f"Loaded {sum(len(v) for v in terms.values())} regulatory terms from {filename}")
-            return terms
-        except Exception as e:
-            logger.error(f"Error loading regulatory terms from {filename}: {e}")
-            return {}   
+        if filename and os.path.exists(filename):
+            try:
+                with open(filename, 'r', encoding='utf-8') as f:
+                    terms = json.load(f)
+                logger.info(f"Loaded regulatory terms from {filename}")
+                return terms
+            except Exception as e:
+                logger.error(f"Error loading regulatory terms: {e}")
         
-    def extract_pdf_metadata(self, pdf_path: str) -> Dict[str, Any]:
-        """Extract metadata from PDF document properties.
-
-        Args:
-            pdf_path: Path to PDF file
-
-        Returns:
-            Dictionary of PDF metadata
+        return minimal_terms
+        
+    def extract_from_text(self, text: str, max_text_length: int = 10000) -> Dict[str, Any]:
         """
-        metadata = {}
-        
-        try:
-            doc = fitz.open(pdf_path)
-
-            pdf_metadata = doc.metadata
-            if pdf_metadata:
-                if "title" in pdf_metadata and pdf_metadata["title"]:
-                    metadata["title"] = pdf_metadata["title"]
-                if "author" in pdf_metadata and pdf_metadata["author"]:
-                    metadata["author"] = pdf_metadata["author"]
-                if "subject" in pdf_metadata and pdf_metadata["subject"]:
-                    metadata["subject"] = pdf_metadata["subject"]
-                if "keywords" in pdf_metadata and pdf_metadata["keywords"]:
-                    metadata["keywords"] = [k.strip() for k in pdf_metadata["keywords"].split(",")]
-                if "creationDate" in pdf_metadata and pdf_metadata["creationDate"]:
-                    try:
-                        date_str = pdf_metadata["creationDate"]
-                        if date_str.startswith("D:"):
-                            date_str = date_str[2:]
-                            if len(date_str) >= 8:
-                                date = datetime.datetime.strptime(date_str[:8], "%Y%m%d")
-                                metadata["creation_date"] = date.strftime("%Y-%m-%d")
-                    except Exception as e:
-                        logger.warning(f"Error parsing PDF creation date: {e}")
-                        
-            metadata["page_count"] = len(doc)
-            
-            metadata["file_size_bytes"] = os.path.getsize(pdf_path)
-            metadata["file_size_mb"] = round(metadata["file_size_bytes"] / (1024 * 1024), 2)
-            
-            doc.close()
-        except Exception as e:
-            logger.error(f"Error extracting PDF metadata from {pdf_path}: {e}")
-        
-        return metadata
-    
-    def extract_from_text(self, text: str) -> Dict[str, Any]:
-        """
-        Extract metadata from document text.
+        Extract metadata from document text with limits on text processing.
         
         Args:
             text: Document text
+            max_text_length: Maximum text length to process
             
         Returns:
             Dictionary of extracted metadata
         """
+        text_to_process = text[:max_text_length]
         metadata = {}
         
         for field, patterns in self.patterns.items():
             for pattern in patterns:
-                matches = re.findall(pattern, text, re.IGNORECASE)
+                matches = re.findall(pattern, text_to_process, re.IGNORECASE)
                 if matches:
                     if field in ["cfr_references", "iso_references"]:
                         metadata[field] = list(set(matches))
@@ -164,46 +133,45 @@ class MetadataExtractor:
                     else:
                         metadata[field] = matches[0]
                         break
-        
-        if "document_date" in metadata:
+
+        if "document_date" in metadata and DATEUTIL_AVAILABLE:
             try:
                 parsed_date = dateutil.parser.parse(metadata["document_date"])
                 metadata["document_date"] = parsed_date.strftime("%Y-%m-%d")
             except Exception:
                 pass
-        
+
         if "title" not in metadata:
-            first_lines = text.split('\n')[:10]
+            first_lines = text_to_process.split('\n')[:10]
             for line in first_lines:
                 line = line.strip()
                 if len(line) > 20 and len(line) < 150 and not line.startswith('http'):
                     metadata["title"] = line
                     break
-        
+
         if self.use_nlp and self.nlp:
-            first_chunk = text[:min(10000, len(text))]
+            first_chunk = text_to_process[:5000]
             doc = self.nlp(first_chunk)
-            
-            orgs = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
-            if orgs:
-                metadata["organizations"] = list(set(orgs))
-            
-            self._extract_regulatory_entities(text, metadata)
 
-            persons = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
-            if persons:
-                metadata["persons"] = list(set(persons))
-
-            locations = [ent.text for ent in doc.ents if ent.label_ == "GPE" or ent.label_ == "LOC"]
-            if locations:
-                metadata["locations"] = list(set(locations))
+            entities = {
+                "organizations": [],
+                "regulatory_references": []
+            }
             
-            dates = [ent.text for ent in doc.ents if ent.label_ == "DATE"]
-            if dates:
-                metadata["dates_mentioned"] = list(set(dates))
+            for ent in doc.ents:
+                if ent.label_ == "ORG":
+                    entities["organizations"].append(ent.text)
+                elif ent.label_ == "LAW":
+                    entities["regulatory_references"].append(ent.text)
+
+            for key, values in entities.items():
+                if values:
+                    metadata[key] = list(set(values))
+
+            self._extract_regulatory_entities(text_to_process, metadata)
 
         if text:
-            metadata["document_hash"] = hashlib.md5(text.encode('utf-8')).hexdigest()
+            metadata["document_hash"] = hashlib.md5(text[:5000].encode('utf-8')).hexdigest()
         
         return metadata
     
@@ -215,6 +183,7 @@ class MetadataExtractor:
             text: Document text
             metadata: Metadata dictionary to update
         """
+        # Only look for the most important terms
         for category, terms in self.regulatory_terms.items():
             found_terms = []
             for term in terms:
@@ -227,7 +196,7 @@ class MetadataExtractor:
                 
     def extract_from_pdf(self, pdf_path: str) -> Dict[str, Any]:
         """
-        Extract metadata from PDF file, combining PDF properties and text-based extraction.
+        Extract metadata from PDF file, with minimal PDF parsing.
         
         Args:
             pdf_path: Path to PDF file
@@ -235,51 +204,84 @@ class MetadataExtractor:
         Returns:
             Dictionary of extracted metadata
         """
-        metadata = self.extract_pdf_metadata(pdf_path)
-        
-        try:
-            doc = fitz.open(pdf_path)
-            text = ""
-            for page in doc:
-                text += page.get_text()
-            doc.close()
+        metadata = {
+            "filename": os.path.basename(pdf_path),
+            "file_extension": ".pdf",
+            "file_size_bytes": os.path.getsize(pdf_path),
+            "extraction_date": datetime.datetime.now().strftime("%Y-%m-%d")
+        }
 
-            text_metadata = self.extract_from_text(text)
+        if PYMUPDF_AVAILABLE:
+            try:
+                doc = fitz.open(pdf_path)
+                pdf_metadata = doc.metadata
+                if pdf_metadata:
+                    metadata.update({
+                        "title": pdf_metadata.get("title", ""),
+                        "author": pdf_metadata.get("author", ""),
+                        "subject": pdf_metadata.get("subject", ""),
+                        "page_count": len(doc)
+                    })
 
-            for key, value in text_metadata.items():
-                if key not in metadata:
-                    metadata[key] = value
+                text = ""
+                for page_idx in range(min(5, len(doc))):
+                    page = doc[page_idx]
+                    text += page.get_text()
+                doc.close()
 
-            file_path = Path(pdf_path)
-            metadata["filename"] = file_path.name
-            metadata["file_extension"] = file_path.suffix.lower()
-            metadata["extraction_date"] = datetime.datetime.now().strftime("%Y-%m-%d")
-            
-        except Exception as e:
-            logger.error(f"Error extracting text from PDF {pdf_path}: {e}")
+                text_metadata = self.extract_from_text(text)
+
+                for key, value in text_metadata.items():
+                    if key not in metadata or not metadata[key]:
+                        metadata[key] = value
+                
+            except Exception as e:
+                logger.error(f"Error extracting from PDF {pdf_path}: {e}")
         
         return metadata
     
-    def save_metadata(self, metadata: Dict[str, Any], output_path: str) -> bool:
+    def extract_from_json(self, json_path: str) -> Dict[str, Any]:
         """
-        Save extracted metadata to JSON file.
+        Extract metadata from JSON file containing pre-extracted text.
         
         Args:
-            metadata: Dictionary of metadata
-            output_path: Path to save JSON file
+            json_path: Path to JSON file
             
         Returns:
-            True if successful, False otherwise
+            Dictionary of extracted metadata
         """
+        metadata = {
+            "filename": os.path.basename(json_path),
+            "file_extension": ".json",
+            "file_size_bytes": os.path.getsize(json_path),
+            "extraction_date": datetime.datetime.now().strftime("%Y-%m-%d")
+        }
+        
         try:
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(metadata, f, indent=2, ensure_ascii=False)
-            logger.info(f"Saved metadata to {output_path}")
-            return True
-        except Exception as e:
-            logger.error(f"Error saving metadata to {output_path}: {e}")
-            return False
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
 
+            if isinstance(data, dict):
+                text = data.get("text", "")
+
+                if "metadata" in data and isinstance(data["metadata"], dict):
+                    for key, value in data["metadata"].items():
+                        metadata[key] = value
+            else:
+                text = str(data)
+
+            if text:
+                text_metadata = self.extract_from_text(text)
+
+                for key, value in text_metadata.items():
+                    if key not in metadata or not metadata[key]:
+                        metadata[key] = value
+            
+        except Exception as e:
+            logger.error(f"Error extracting from JSON {json_path}: {e}")
+        
+        return metadata
+    
     def process_document(self, doc_path: str, output_dir: Optional[str] = None) -> Dict[str, Any]:
         """
         Process a document and extract its metadata.
@@ -299,6 +301,8 @@ class MetadataExtractor:
 
         if file_path.suffix.lower() == '.pdf':
             metadata = self.extract_from_pdf(doc_path)
+        elif file_path.suffix.lower() == '.json':
+            metadata = self.extract_from_json(doc_path)
         else:
             try:
                 with open(doc_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -308,8 +312,6 @@ class MetadataExtractor:
                 metadata["filename"] = file_path.name
                 metadata["file_extension"] = file_path.suffix.lower()
                 metadata["file_size_bytes"] = os.path.getsize(doc_path)
-                metadata["file_size_mb"] = round(metadata["file_size_bytes"] / (1024 * 1024), 2)
-                metadata["extraction_date"] = datetime.datetime.now().strftime("%Y-%m-%d")
                 
             except Exception as e:
                 logger.error(f"Error processing file {doc_path}: {e}")
@@ -317,18 +319,25 @@ class MetadataExtractor:
 
         if output_dir:
             output_path = Path(output_dir) / f"{file_path.stem}_metadata.json"
-            self.save_metadata(metadata, str(output_path))
+            try:
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    json.dump(metadata, f, indent=2, ensure_ascii=False)
+                logger.info(f"Saved metadata to {output_path}")
+            except Exception as e:
+                logger.error(f"Error saving metadata: {e}")
         
         return metadata
     
-    def batch_process(self, input_dir: str, output_dir: str, file_types: List[str] = ['.pdf', '.txt']) -> List[Dict[str, Any]]:
+    def batch_process(self, input_dir: str, output_dir: str, file_types: List[str] = ['.pdf', '.txt', '.json'], max_files: int = 100) -> List[Dict[str, Any]]:
         """
-        Process all documents of specified types in a directory.
+        Process a limited number of documents to conserve resources.
         
         Args:
             input_dir: Directory containing documents
             output_dir: Directory to save metadata files
             file_types: List of file extensions to process
+            max_files: Maximum number of files to process
             
         Returns:
             List of metadata dictionaries
@@ -337,14 +346,23 @@ class MetadataExtractor:
         
         results = []
         input_path = Path(input_dir)
-        
+        files_processed = 0
+
         for file_type in file_types:
-            for file_path in input_path.glob(f"*{file_type}"):
+            for file_path in input_path.glob(f"**/*{file_type}"):
+                if files_processed >= max_files:
+                    logger.info(f"Reached maximum file limit of {max_files}")
+                    break
+                    
                 logger.info(f"Processing {file_path}")
                 metadata = self.process_document(str(file_path), output_dir)
                 if metadata:
                     results.append(metadata)
-        
+                    files_processed += 1
+            
+            if files_processed >= max_files:
+                break
+
         summary = {
             "processed_files": len(results),
             "processing_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -356,4 +374,3 @@ class MetadataExtractor:
             json.dump(summary, f, indent=2)
         
         return results
-    
