@@ -18,7 +18,13 @@ import nltk
 try:
     sent_tokenize("test sentence")
 except LookupError:
-    nltk.download('punkt', quiet=True)
+    nltk.download('punkt_tab', quiet=True)
+
+try:
+    from nltk.corpus import stopwords
+    stopwords.words('english')
+except LookupError:
+    nltk.download('stopwords', quiet=True)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
