@@ -1,8 +1,6 @@
 import re
 import logging
 import unicodedata
-import string
-import argparse
 from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
 import nltk
@@ -20,7 +18,7 @@ try:
     sent_tokenize("test sentence")
     stopwords.words('english')
 except LookupError:
-    nltk.download('punkt', quiet=True)
+    nltk.download('punkt_tab', quiet=True)
     nltk.download('stopwords', quiet=True)
     
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
