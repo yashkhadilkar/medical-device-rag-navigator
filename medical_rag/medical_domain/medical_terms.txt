@@ -1,0 +1,203 @@
+# Medical Device Terminology
+# This file contains common medical device terms, regulatory phrases,
+# and specialized vocabulary to improve spell checking and query handling
+
+# Regulatory bodies and agencies
+FDA
+CDRH
+EMA
+PMDA
+MHRA
+Health Canada
+NMPA
+ANVISA
+TGA
+
+# Regulatory frameworks and terms
+510(k)
+510k
+premarket notification
+PMA
+premarket approval
+De Novo
+HDE
+humanitarian device exemption
+EUA
+emergency use authorization
+compassionate use
+IDE
+investigational device exemption
+BLA
+QSR
+quality system regulation
+MDR
+medical device reporting
+UDI
+unique device identifier
+GUDID
+CFR
+Code of Federal Regulations
+substantial equivalence
+predicate device
+FD&C Act
+special controls
+general controls
+Class I
+Class II
+Class III
+classification panel
+exempt device
+presubmission
+breakthrough device
+Q-submission
+device master record
+device history record
+design history file
+design controls
+process validation
+acceptance activities
+corrective action
+preventive action
+CAPA
+market clearance
+market approval
+
+# Device types and categories
+SaMD
+software as a medical device
+IVD
+in vitro diagnostic
+active implantable
+non-active implantable
+pacemaker
+defibrillator
+stent
+catheter
+glucose monitor
+ventilator
+infusion pump
+anesthesia workstation
+orthopedic implant
+dental implant
+surgical robot
+diagnostic imaging
+radiology
+ultrasound
+MRI
+CT scanner
+digital health
+mobile medical application
+wearable device
+remote monitoring
+telemedicine
+point of care testing
+laboratory diagnostic
+clinical chemistry
+microbiology
+pathology
+immunology
+hematology
+anatomical pathology
+radiological device
+cardiovascular device
+orthopedic device
+general hospital device
+neurology device
+physical medicine device
+obstetrical device
+gynecological device
+ophthalmic device
+dental device
+gastroenterology device
+urology device
+
+# Testing and evaluation terms
+biocompatibility
+sterilization
+shelf life
+validation
+verification
+design verification testing
+design validation testing
+software validation
+usability testing
+human factors testing
+clinical study
+clinical investigation
+clinical trial
+bench testing
+analytical testing
+animal testing
+performance testing
+electrical safety testing
+electromagnetic compatibility
+EMC
+packaging integrity
+transport validation
+cleaning validation
+accelerated aging
+real-time aging
+mechanical testing
+fatigue testing
+durability testing
+risk management
+risk analysis
+hazard analysis
+FMEA
+failure modes and effects analysis
+FTA
+fault tree analysis
+risk mitigation
+residual risk
+benefit-risk assessment
+post-market surveillance
+real-world evidence
+MAUDE
+manufacturer and user facility device experience
+
+# Standards and guidance
+ISO
+IEC
+ASTM
+AAMI
+ANSI
+ISO 13485
+ISO 14971
+ISO 10993
+IEC 60601
+IEC 62304
+ISO 14155
+guidance document
+technical considerations
+special controls
+recognized standard
+consensus standard
+
+# Quality and manufacturing
+GMP
+good manufacturing practice
+design control
+document control
+purchasing control
+production control
+process control
+inspection
+nonconforming product
+rework
+release criteria
+quality policy
+quality objective
+quality management system
+management review
+internal audit
+supplier evaluation
+change control
+design transfer
+specification
+acceptance criteria
+calibration
+preventive maintenance
+corrective maintenance
+DHF
+DMR
+DHR
