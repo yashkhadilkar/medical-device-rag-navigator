@@ -502,16 +502,13 @@ Answer:
         formatted_context = ""
         
         for i, doc in enumerate(context_docs):
-            # Make sure to include the actual text content
             text = doc.get("text", "")
             metadata = doc.get("metadata", {})
             title = metadata.get("title", f"Document {i+1}")
             source = metadata.get("source", "Unknown")
-            
-            # Debug info to verify text is present
+
             logger.info(f"DEBUG: Document {i+1} text length: {len(text)}")
-            
-            # Check if text is missing or too short, try to find it in metadata
+
             if len(text) < 50 and "text" in metadata:
                 logger.info(f"Using text from metadata ({len(metadata['text'])} chars) instead of short document text")
                 text = metadata["text"]

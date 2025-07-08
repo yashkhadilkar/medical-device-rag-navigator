@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+"""
+EmbeddingGenerator using HuggingFace Transformers as primary method.
+This version prioritizes HuggingFace Transformers over SentenceTransformers for better reliability.
+"""
+
 import os 
 import logging
 import numpy as np
@@ -8,14 +14,6 @@ import time
 import hashlib
 
 try:
-    from sentence_transformers import SentenceTransformer
-    SENTENCE_TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    SENTENCE_TRANSFORMERS_AVAILABLE = False
-    logging.warning("sentence-transformers not available. Install with: pip install sentence-transformers")
-
-# Importing transformers for fallback
-try:
     import torch
     from transformers import AutoTokenizer, AutoModel
     TRANSFORMERS_AVAILABLE = True
@@ -23,17 +21,25 @@ except ImportError:
     TRANSFORMERS_AVAILABLE = False
     logging.warning("transformers not available. Install with: pip install transformers torch")
 
+# Fallback: SentenceTransformers (if needed)
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+    logging.warning("sentence-transformers not available. Install with: pip install sentence-transformers")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
 class EmbeddingGenerator:
-    """Generate embeddings for text chunks using various embedding models.
+    """Generate embeddings for text chunks using HuggingFace Transformers.
     Optimized for minimal resource usage and cloud compatibility.
     """
     
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", cache_dir: Optional[str] = "data/embeddings_cache", device: str = "cpu", use_api: bool = False, api_key: Optional[str] = None):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", cache_dir: Optional[str] = "data/embeddings_cache", 
+                 device: str = "cpu", use_api: bool = False, api_key: Optional[str] = None):
         """
         Initialize the embedding generator.
         
@@ -54,13 +60,11 @@ class EmbeddingGenerator:
             os.makedirs(cache_dir, exist_ok=True)
 
         self.model_loaded = False
-
-        self.embedding_dim = 384 
-
+        self.embedding_dim = 384  # Default for all-MiniLM-L6-v2
         self.model = None
+        self.tokenizer = None
         
         logger.info(f"Initialized embedding generator with model {model_name} (lazy loading)")
-        
         
     def _load_model(self):
         """Load the embedding model (called on first use)."""
@@ -69,89 +73,53 @@ class EmbeddingGenerator:
             
         try: 
             logger.info(f"Loading embedding model: {self.model_name}")
-            
-            if SENTENCE_TRANSFORMERS_AVAILABLE:
-                self.model = SentenceTransformer(self.model_name, device=self.device)
-                self.embedding_dim = self.model.get_sentence_embedding_dimension()
-                logger.info(f"Loaded sentence-transformers model. Embedding dimension: {self.embedding_dim}")
-            elif TRANSFORMERS_AVAILABLE:
-                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-                self.model = AutoModel.from_pretrained(self.model_name).to(self.device)
+
+            if TRANSFORMERS_AVAILABLE:
+                if not self.model_name.startswith('sentence-transformers/'):
+                    model_path = f'sentence-transformers/{self.model_name}'
+                else:
+                    model_path = self.model_name
+                
+                self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+                self.model = AutoModel.from_pretrained(model_path).to(self.device)
+
                 with torch.no_grad():
                     test_input = self.tokenizer("test", return_tensors="pt").to(self.device)
                     test_output = self.model(**test_input)
                     self.embedding_dim = test_output.last_hidden_state.shape[-1]
-                logger.info(f"Loaded transformers model. Embedding dimension: {self.embedding_dim}")
-            else:
-                logger.error("No embedding libraries available. Install sentence-transformers or transformers.")
-                return
                 
-            self.model_loaded = True
-            
+                logger.info(f"✅ Loaded HuggingFace Transformers model. Embedding dimension: {self.embedding_dim}")
+                self.model_loaded = True
+
+            elif SENTENCE_TRANSFORMERS_AVAILABLE:
+                self.model = SentenceTransformer(self.model_name, device=self.device)
+                self.embedding_dim = self.model.get_sentence_embedding_dimension()
+                logger.info(f"✅ Loaded SentenceTransformers model. Embedding dimension: {self.embedding_dim}")
+                self.model_loaded = True
+                
+            else:
+                logger.error("❌ No embedding libraries available. Install transformers or sentence-transformers.")
+                raise ImportError("No embedding libraries available")
+                
         except Exception as e:
-            logger.error(f"Error loading embedding model: {e}")
+            logger.error(f"❌ Error loading embedding model: {e}")
             raise
-        
-    def _get_cache_path(self, text_hash: str) -> str:
-        """
-        Get path for cached embedding.
-        
-        Args:
-            text_hash: Hash of the text
-            
-        Returns:
-            Path to the cached embedding file
-        """
-        if not self.cache_dir:
-            return None
-            
-        return os.path.join(self.cache_dir, f"{text_hash}_{self.model_name}.npy")
-    
-    def _compute_text_hash(self, text: str) -> str:
-        """
-        Compute hash for text to use as cache key.
-        
-        Args:
-            text: Input text
-            
-        Returns:
-            Hash string
-        """
-        return hashlib.md5(text.encode('utf-8')).hexdigest()
     
     def _mean_pooling(self, model_output, attention_mask):
-        """
-        Perform mean pooling for transformers model output.
-        
-        Args:
-            model_output: Output from the model
-            attention_mask: Attention mask from tokenizer
-            
-        Returns:
-            Pooled embeddings
-        """
+        """Perform mean pooling for transformers model output."""
         token_embeddings = model_output.last_hidden_state
         input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
         return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
     
     def _generate_embedding_with_transformers(self, text: str) -> np.ndarray:
-        """
-        Generate embedding using transformers library.
-        
-        Args:
-            text: Input text
-            
-        Returns:
-            Embedding vector
-        """
+        """Generate embedding using HuggingFace Transformers."""
         encoded_input = self.tokenizer(text, padding=True, truncation=True, 
                                      max_length=512, return_tensors='pt').to(self.device)
         
         with torch.no_grad():
             model_output = self.model(**encoded_input)
-
-        sentence_embeddings = self._mean_pooling(model_output, encoded_input['attention_mask'])
-        sentence_embeddings = torch.nn.functional.normalize(sentence_embeddings, p=2, dim=1)
+            sentence_embeddings = self._mean_pooling(model_output, encoded_input['attention_mask'])
+            sentence_embeddings = torch.nn.functional.normalize(sentence_embeddings, p=2, dim=1)
         
         return sentence_embeddings.cpu().numpy()[0]
     
@@ -184,36 +152,31 @@ class EmbeddingGenerator:
             self._load_model()
 
         try:
-            if hasattr(self, 'model') and self.model is not None:
-                if SENTENCE_TRANSFORMERS_AVAILABLE and isinstance(self.model, SentenceTransformer):
-                    embedding = self.model.encode(text, normalize_embeddings=True)
-                elif TRANSFORMERS_AVAILABLE:
-                    embedding = self._generate_embedding_with_transformers(text)
-                else:
-                    logger.error("No valid model available for embedding generation")
-                    return np.zeros(self.embedding_dim)
-
-                if cache_path:
-                    np.save(cache_path, embedding)
-                    
-                return embedding
+            if hasattr(self, 'tokenizer') and self.tokenizer is not None:
+                embedding = self._generate_embedding_with_transformers(text)
+            elif hasattr(self, 'model') and hasattr(self.model, 'encode'):
+                embedding = self.model.encode(text, normalize_embeddings=True)
             else:
-                logger.error("Model not properly initialized")
+                logger.error("No valid model available for embedding generation")
                 return np.zeros(self.embedding_dim)
+
+            if cache_path:
+                np.save(cache_path, embedding)
                 
+            return embedding
+            
         except Exception as e:
             logger.error(f"Error generating embedding: {e}")
             return np.zeros(self.embedding_dim)
-        
+    
     def embed_texts(self, texts: List[str], batch_size: int = 8, 
                    use_cache: bool = True, show_progress: bool = True) -> List[np.ndarray]:
         """
         Generate embeddings for multiple texts.
-        Uses smaller batch size to reduce memory requirements.
         
         Args:
             texts: List of texts to embed
-            batch_size: Batch size for embedding generation (smaller for RAM efficiency)
+            batch_size: Batch size for embedding generation
             use_cache: Whether to use cached embeddings
             show_progress: Whether to show progress
             
@@ -264,14 +227,14 @@ class EmbeddingGenerator:
                 batch_texts = texts_to_embed[i:i+batch_size]
                 
                 try:
-                    if SENTENCE_TRANSFORMERS_AVAILABLE and isinstance(self.model, SentenceTransformer):
-                        batch_embeddings = self.model.encode(batch_texts, normalize_embeddings=True)
-                    elif TRANSFORMERS_AVAILABLE:
-                        batch_embeddings = []
+                    batch_embeddings = []
+
+                    if hasattr(self, 'tokenizer') and self.tokenizer is not None:
                         for text in batch_texts:
                             embedding = self._generate_embedding_with_transformers(text)
                             batch_embeddings.append(embedding)
-                        batch_embeddings = np.array(batch_embeddings)
+                    elif hasattr(self, 'model') and hasattr(self.model, 'encode'):
+                        batch_embeddings = self.model.encode(batch_texts, normalize_embeddings=True)
                     else:
                         logger.error("No valid model available for embedding generation")
                         batch_embeddings = [np.zeros(self.embedding_dim) for _ in batch_texts]
@@ -286,7 +249,7 @@ class EmbeddingGenerator:
                             np.save(cache_path, embedding)
                     
                     if show_progress and i % (batch_size * 2) == 0:
-                        logger.info(f"Processed {i}/{len(texts_to_embed)} texts")
+                        logger.info(f"Processed {i+batch_size}/{len(texts_to_embed)} texts")
                         
                 except Exception as e:
                     logger.error(f"Error generating batch embeddings: {e}")
@@ -332,15 +295,13 @@ class EmbeddingGenerator:
         
         Args:
             chunks: List of chunks with embeddings
-            output_path: Path to save the file
-            embedding_key: Key that contains the embedding in each chunk
+            output_path: Path to save the embeddings
+            embedding_key: Key containing the embedding in each chunk
             
         Returns:
             True if successful, False otherwise
         """
         try:
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
             serializable_chunks = []
             for chunk in chunks:
                 chunk_copy = chunk.copy()
@@ -348,97 +309,74 @@ class EmbeddingGenerator:
                     chunk_copy[embedding_key] = chunk_copy[embedding_key].tolist()
                 serializable_chunks.append(chunk_copy)
             
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(serializable_chunks, f, ensure_ascii=False, indent=2)
-                
+            with open(output_path, 'w') as f:
+                json.dump(serializable_chunks, f, indent=2)
+            
             logger.info(f"Saved {len(chunks)} embedded chunks to {output_path}")
             return True
+            
         except Exception as e:
-            logger.error(f"Error saving embeddings to {output_path}: {e}")
+            logger.error(f"Error saving embeddings to file: {e}")
             return False
-        
+    
     def load_embeddings_from_file(self, input_path: str, embedding_key: str = "embedding") -> List[Dict[str, Any]]:
         """
         Load embedded chunks from a file.
         
         Args:
-            input_path: Path to the file
-            embedding_key: Key that contains the embedding in each chunk
+            input_path: Path to load the embeddings from
+            embedding_key: Key containing the embedding in each chunk
             
         Returns:
-            List of chunks with embeddings
+            List of chunks with embeddings loaded
         """
         try:
-            with open(input_path, 'r', encoding='utf-8') as f:
+            with open(input_path, 'r') as f:
                 chunks = json.load(f)
 
             for chunk in chunks:
-                if embedding_key in chunk:
+                if embedding_key in chunk and isinstance(chunk[embedding_key], list):
                     chunk[embedding_key] = np.array(chunk[embedding_key])
             
             logger.info(f"Loaded {len(chunks)} embedded chunks from {input_path}")
             return chunks
+            
         except Exception as e:
-            logger.error(f"Error loading embeddings from {input_path}: {e}")
+            logger.error(f"Error loading embeddings from file: {e}")
             return []
-        
-    def unload_model(self):
-        """
-        Unload the model to free memory when not needed.
-        """
-        if self.model_loaded:
-            self.model = None
-            self.model_loaded = False
-
-            if self.device.startswith('cuda'):
-                try:
-                    import torch
-                    import sys
-                    if 'torch' in sys.modules:
-                        torch.cuda.empty_cache()
-                except:
-                    pass
-                
-            logger.info("Unloaded embedding model to free memory")
-            
+    
+    def _get_cache_path(self, text_hash: str) -> str:
+        """Get path for cached embedding."""
+        if not self.cache_dir:
+            return None
+        return os.path.join(self.cache_dir, f"{text_hash}_{self.model_name}.npy")
+    
+    def _compute_text_hash(self, text: str) -> str:
+        """Compute hash for text to use as cache key."""
+        return hashlib.md5(text.encode('utf-8')).hexdigest()
+    
+    def get_embedding_dimension(self) -> int:
+        """Get the embedding dimension."""
+        if not self.model_loaded:
+            self._load_model()
+        return self.embedding_dim
+    
     def clear_cache(self):
-        """
-        Clear the embedding cache to free disk space.
-        """
-        if not self.cache_dir or not os.path.exists(self.cache_dir):
-            logger.warning("No cache directory to clear")
-            return
-            
-        try:
-            cache_files = list(Path(self.cache_dir).glob("*.npy"))
-            file_count = len(cache_files)
-
-            for file_path in cache_files:
-                try:
-                    os.remove(file_path)
-                except Exception as e:
-                    logger.warning(f"Error removing cache file {file_path}: {e}")
-            
-            logger.info(f"Cleared {file_count} files from embedding cache")
-        except Exception as e:
-            logger.error(f"Error clearing cache: {e}")
-            
-if __name__ == "__main__":
-    # Initialize the embedding generator
-    embedding_generator = EmbeddingGenerator(model_name="all-MiniLM-L6-v2")
+        """Clear the embedding cache."""
+        if self.cache_dir and os.path.exists(self.cache_dir):
+            for filename in os.listdir(self.cache_dir):
+                if filename.endswith('.npy'):
+                    os.remove(os.path.join(self.cache_dir, filename))
+            logger.info("Embedding cache cleared")
     
-    # Sample text chunks
-    sample_chunks = [
-        {"id": "1", "text": "The FDA regulates medical devices through the 510(k) premarket notification process."},
-        {"id": "2", "text": "Class III medical devices require Premarket Approval (PMA) from the FDA."}
-    ]
-    
-    # Generate embeddings for the chunks
-    embedded_chunks = embedding_generator.embed_chunks(sample_chunks)
-    
-    # Print embedding dimensions
-    for chunk in embedded_chunks:
-        print(f"Chunk {chunk['id']} embedding shape: {chunk['embedding'].shape}")
-        
-    # Clean up memory when done
-    embedding_generator.unload_model()
+    def get_model_info(self) -> Dict[str, Any]:
+        """Get information about the loaded model."""
+        return {
+            'model_name': self.model_name,
+            'embedding_dim': self.embedding_dim,
+            'model_loaded': self.model_loaded,
+            'device': self.device,
+            'cache_dir': self.cache_dir,
+            'transformers_available': TRANSFORMERS_AVAILABLE,
+            'sentence_transformers_available': SENTENCE_TRANSFORMERS_AVAILABLE
+        }

@@ -28,6 +28,13 @@ except ImportError:
     NLTK_AVAILABLE = False
     logging.warning("NLTK not available. Install with: pip install nltk")
 
+try:
+    from spellchecker import SpellChecker
+    SPELL_CHECKER_AVAILABLE = True
+except ImportError:
+    SPELL_CHECKER_AVAILABLE = False
+    logging.warning("SpellChecker not available. Install with: pip install pyspellchecker")
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -49,7 +56,9 @@ class QueryProcessor:
     def __init__(self, 
                  domain_terms_file: Optional[str] = None,
                  cache_dir: str = ".cache/queries",
-                 enable_advanced_nlp: bool = False):
+                 enable_advanced_nlp: bool = False,
+                 enable_spell_check: bool = True,
+                 medical_terms_file: Optional[str] = None):
         """
         Initialize the query processor.
         
@@ -57,8 +66,11 @@ class QueryProcessor:
             domain_terms_file: Path to JSON file with domain terms
             cache_dir: Directory for caching query results
             enable_advanced_nlp: Whether to use advanced NLP (more resource-intensive)
+            enable_spell_check: Whether to enable spell checking for queries
+            medical_terms_file: Path to file with medical terminology for spell checking
         """
         self.enable_advanced_nlp = enable_advanced_nlp and NLTK_AVAILABLE
+        self.enable_spell_check = enable_spell_check and SPELL_CHECKER_AVAILABLE
         self.domain_terms = self._load_domain_terms(domain_terms_file)
         self.query_history = []
         
@@ -106,8 +118,13 @@ class QueryProcessor:
                 r'biocompatibility'
             ]
         }
+
+        if self.enable_spell_check:
+            self.spell_checker = SpellChecker()
+            self._load_medical_terms(medical_terms_file)
+            logger.info("Spell checker initialized")
         
-        logger.info(f"Initialized query processor with advanced NLP: {self.enable_advanced_nlp}")
+        logger.info(f"Initialized query processor with advanced NLP: {self.enable_advanced_nlp}, spell checking: {self.enable_spell_check}")
         
     def _load_domain_terms(self, filename: Optional[str]) -> Dict[str, List[str]]:
         """Load domain-specific terms for query enhancement."""
@@ -141,6 +158,128 @@ class QueryProcessor:
                 
         return default_terms
     
+    def _load_medical_terms(self, filename: Optional[str]) -> None:
+        """
+        Load medical and regulatory terminology for spell checking.
+        
+        Args:
+            filename: Path to the medical terms file
+        """
+        if not self.enable_spell_check:
+            return
+
+        default_terms = [
+            "510k", "510(k)", "PMA", "De Novo", "HDE", "CFR", "MDR", "UDI", "QSR", 
+            "GUDID", "FDA", "CDRH", "SaMD", "biocompatibility", "premarket",
+
+            "implantable", "implant", "pacemaker", "catheter", "stent", "diagnostic",
+            "therapeutic", "monitoring", "surgical", "wearable", "glucose", "insulin",
+            "defibrillator", "ventilator", "orthopedic", "dental", "ophthalmic",
+            "cardiovascular", "neurological", "radiology", "anesthesiology",
+
+            "Class I", "Class II", "Class III", "exempt", "non-exempt", "substantial",
+            "equivalence", "predicate", "special controls", "general controls"
+        ]
+
+        for term in default_terms:
+            self.spell_checker.word_frequency.add(term)
+
+            self.spell_checker.word_frequency.add(term.lower())
+
+            if " " in term:
+                self.spell_checker.word_frequency.add(term.replace(" ", ""))
+
+        if filename and os.path.exists(filename):
+            try:
+                with open(filename, 'r', encoding='utf-8') as f:
+                    custom_terms = [line.strip() for line in f if line.strip()]
+                
+                for term in custom_terms:
+                    self.spell_checker.word_frequency.add(term)
+                
+                logger.info(f"Loaded {len(custom_terms)} medical terms from {filename}")
+            except Exception as e:
+                logger.error(f"Error loading medical terms: {e}")
+    
+    def correct_spelling(self, query: str) -> str:
+        """
+        Correct spelling errors in the query.
+        
+        Args:
+            query: Original query with potential typos
+            
+        Returns:
+            Corrected query
+        """
+        if not self.enable_spell_check:
+            return query
+            
+        try:
+            words = re.findall(r'\b[\w\']+\b', query)
+            corrected_words = []
+            
+            for word in words:
+                if (word.isdigit() or 
+                    len(word) <= 2 or 
+                    word.isupper() or
+                    any(char.isdigit() for char in word)):
+                    corrected_words.append(word)
+                    continue
+
+                if self.spell_checker.unknown([word]):
+                    correction = self.spell_checker.correction(word)
+
+                    if correction and self._edit_distance(word, correction) <= 2:
+                        corrected_words.append(correction)
+                    else:
+                        corrected_words.append(word)
+                else:
+                    corrected_words.append(word)
+
+            corrected_query = query
+            for original, corrected in zip(words, corrected_words):
+                if original != corrected:
+                    pattern = r'\b' + re.escape(original) + r'\b'
+                    corrected_query = re.sub(pattern, corrected, corrected_query)
+
+            if corrected_query != query:
+                logger.info(f"Corrected query: '{query}' -> '{corrected_query}'")
+                
+            return corrected_query
+            
+        except Exception as e:
+            logger.warning(f"Error in spell checking: {e}")
+            return query
+            
+    def _edit_distance(self, s1: str, s2: str) -> int:
+        """
+        Calculate the Levenshtein edit distance between two strings.
+        
+        Args:
+            s1: First string
+            s2: Second string
+            
+        Returns:
+            Edit distance (number of character changes needed)
+        """
+        if len(s1) < len(s2):
+            return self._edit_distance(s2, s1)
+            
+        if len(s2) == 0:
+            return len(s1)
+            
+        previous_row = range(len(s2) + 1)
+        for i, c1 in enumerate(s1):
+            current_row = [i + 1]
+            for j, c2 in enumerate(s2):
+                insertions = previous_row[j + 1] + 1
+                deletions = current_row[j] + 1
+                substitutions = previous_row[j] + (c1 != c2)
+                current_row.append(min(insertions, deletions, substitutions))
+            previous_row = current_row
+            
+        return previous_row[-1]
+    
     def preprocess_query(self, query: str) -> str:
         """
         Preprocess a user query for better retrieval.
@@ -151,6 +290,9 @@ class QueryProcessor:
         Returns:
             Preprocessed query
         """
+        if self.enable_spell_check:
+            query = self.correct_spelling(query)
+            
         processed = query.strip()
         processed = re.sub(r'\s+', ' ', processed)
 
@@ -274,8 +416,7 @@ class QueryProcessor:
                 queries.append("510(k) submission requirements FDA")
             elif "PMA" in query or "premarket approval" in query.lower():
                 queries.append("PMA requirements FDA")
-                
-        # Limit to max_queries
+
         return queries[:max_queries]
     
     def process_query(self, query: str) -> Dict[str, Any]:
@@ -288,17 +429,21 @@ class QueryProcessor:
         Returns:
             Processed query information
         """
+        corrected_query = self.correct_spelling(query) if self.enable_spell_check else query
+        
         processed_info = {
             "original_query": query,
-            "processed_query": self.preprocess_query(query),
-            "query_type": self.identify_query_type(query).value,
-            "keywords": self.extract_keywords(query),
-            "search_queries": self.generate_search_queries(query),
+            "corrected_query": corrected_query,
+            "processed_query": self.preprocess_query(corrected_query),
+            "query_type": self.identify_query_type(corrected_query).value,
+            "keywords": self.extract_keywords(corrected_query),
+            "search_queries": self.generate_search_queries(corrected_query),
             "timestamp": time.time()
         }
 
         self.query_history.append({
             "query": query,
+            "corrected": corrected_query if query != corrected_query else None,
             "processed": processed_info["processed_query"],
             "type": processed_info["query_type"],
             "timestamp": processed_info["timestamp"]
@@ -366,11 +511,15 @@ class QueryProcessor:
             keyword_counts[keyword] = keyword_counts.get(keyword, 0) + 1
             
         top_keywords = sorted(keyword_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        corrections_made = sum(1 for q in recent_queries if q.get("corrected") is not None)
         
         return {
             "total_queries": len(recent_queries),
             "query_types": type_counts,
             "top_keywords": dict(top_keywords),
+            "corrections_made": corrections_made,
+            "correction_rate": corrections_made / len(recent_queries) if recent_queries else 0,
             "days_analyzed": days
         }
         
@@ -391,6 +540,9 @@ class QueryProcessor:
             "results_count": len(results),
             "results": []
         }
+
+        if "corrected_query" in query_info and query_info["original_query"] != query_info["corrected_query"]:
+            formatted["corrected_query"] = query_info["corrected_query"]
 
         docs_map = {}
         for result in results:

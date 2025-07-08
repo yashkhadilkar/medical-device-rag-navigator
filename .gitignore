@@ -1,0 +1,58 @@
+# Virtual Environments
+rag/
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Cache directories
+.cache/
+*.cache
+.embeddings_cache/
+.vector_store/
+data/cache/
+
+# API Keys and sensitive files
+.env
+*.key
+secrets.json
+config_local.json
+
+# Logs
+*.log
+logs/
+streamlit_app.log
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large data files
+*.pdf
+data/raw/
+data/processed/
+models/
+*.model
+*.bin
+
+# Jupyter
+.ipynb_checkpoints/
+
+# pytest
+.pytest_cache/
