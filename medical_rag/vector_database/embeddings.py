@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
 EmbeddingGenerator using HuggingFace Transformers as primary method.
-This version prioritizes HuggingFace Transformers over SentenceTransformers for better reliability.
 """
 
 import os 
