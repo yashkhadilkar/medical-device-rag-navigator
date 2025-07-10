@@ -15,7 +15,7 @@ An AI-powered system that helps navigate FDA medical device regulations using Re
 ## Features
 
 - Smart Document Search: Finds relevant information from 30+ FDA guidance documents and regulations
-- AI-Powered Answers: Generates accurate responses based on official regulatory sources
+- AI-Powered Answers: Generates accurate responses in 2-10 seconds based on official regulatory sources
 - Interactive Interface: Clean web interface for asking regulatory questions
 - Cost-Optimized: Designed to minimize API costs while maintaining quality
 - Citation Support: All answers include references to source documents
