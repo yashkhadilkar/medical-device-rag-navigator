@@ -60,6 +60,19 @@ For the Industry:
 - Accelerate Innovation: Faster regulatory clarity enables more rapid medical device development
 
 ## Tech Stack
+| ***Layer***| ***Technologies*** |     ***Purpose*** |
+| :---:         |     :---:      |          :---: |
+| User Interface  | Streamlit, Custom CSS and HTML, Altair Charts   | Interactive web interface with chat, visualizations, and cost tracking|
+| AI Generation   | OpenAI GPT-4     | Generate accurate, contextual answers with regulatory expertise     |
+| Document Retrieval | HuggingFace Transformers, Vector Similarity Search, Hybrid Retrieval     | Find relevant documents using semantic + keyword search    |
+| Text Processing    | NLTK, Query Processor, Medical Terminology       | Clean text, enhance queries, handle medical device terms     |
+| Document Processing   | pdfplumber, Text Chunking, Metadata Extraction   | Extract and structure content from FDA PDF documents    |
+| Data Storage    | AWS S3, Local Cache      | Store PDFs, vectors, and cached responses efficiently   |
+| Infrastructure  | Python 3.8, OpenAI API Key, AWS Account, Virtual Environment   | Runtime environment, dependency management, security   |
+
+
+| ***Performance*** | 30+ Documents, <3s Response,  60% Cache Hit, $0.01-0.15 per Query|
+| ------------- | ------------- |
 
 ## System Flow
 ![Demo](assets/SystemFlow.png)
