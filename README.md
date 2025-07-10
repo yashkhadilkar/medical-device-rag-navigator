@@ -62,3 +62,4 @@ For the Industry:
 ## Tech Stack
 
 ## System Flow
+![System Flow](assets/System Flow (1).png)
