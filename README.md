@@ -151,4 +151,18 @@ Try asking questions like:
 - "How does the FDA regulate software as a medical device?"
 - "What biocompatibility testing is required for implantable devices?"
 - "What are the labeling requirements for Class II devices?"
+- 
+
+## Contributing
+Contributions are welcome!
+1. Fork the repository
+2. Create feature branch: git checkout -b feature-name
+3. Make changes (never commit API keys!)
+4. Test thoroughly
+5. Submit pull request
+
+#### Areas for contribution:
+* More documents in the S3 bucket. 
+* Performance optimizations
+* Adding URL scraping
 
