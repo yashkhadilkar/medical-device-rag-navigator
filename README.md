@@ -77,3 +77,12 @@ For the Industry:
 ## System Flow
 ![Demo](assets/SystemFlow.png)
 
+## Document Collection
+| ***Current Categories***| ***Examples*** |
+| :---         |     :---:      | 
+| Classification  | Device classification procedures, Product categorization  |
+| Compliance  | QSR (21 CFR 820), Medical device reporting, UDI   | 
+| Software| AI/ML guidance, Software validation, Cybersecurity |
+| Submission   | 510(k), PMA, IDE guidance     | 
+| Testing   | ISO 10993, ISO 14971, Consensus standards  | 
+
