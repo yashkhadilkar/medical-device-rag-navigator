@@ -5,7 +5,7 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 
 
-An AI-powered system that helps navigate FDA medical device regulations using Retrieval-Augmented Generation (RAG). Get expert answers about device classification, 510(k) submissions, compliance requirements, and more - all sourced from official regulatory documents.hways
+An AI-powered system that helps navigate FDA medical device regulations using Retrieval-Augmented Generation (RAG). Get expert answers about device classification, 510(k) submissions, compliance requirements, and more - all sourced from official regulatory documents.
 
 ![Demo](assets/demo.gif)
 
