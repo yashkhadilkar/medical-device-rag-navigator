@@ -23,6 +23,11 @@ An AI-powered system that helps navigate FDA medical device regulations using Re
 
 
 ## Table of Contents
+- [Problem Statement](#problem-statement)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Problem Statement
 
