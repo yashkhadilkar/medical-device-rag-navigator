@@ -86,3 +86,8 @@ For the Industry:
 | Submission   | 510(k), PMA, IDE guidance     | 
 | Testing   | ISO 10993, ISO 14971, Consensus standards  | 
 
+### Adding Your Own Documents
+1. Upload PDFs to your AWS S3 bucket with organized folder structure
+2. Run cache regeneration: python launch_with_cache.py
+3. System automatically processes new documents
+
