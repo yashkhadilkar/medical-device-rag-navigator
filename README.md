@@ -141,4 +141,14 @@ The system will:
 1. Upload PDFs to your AWS S3 bucket with organized folder structure
 2. Run cache regeneration: python launch_with_cache.py
 3. System automatically processes new documents
+4. 
+
+
+## Example Queries
+Try asking questions like:
+- "What class is a blood glucose monitor?"
+- "What documents are needed for a 510(k) submission?"
+- "How does the FDA regulate software as a medical device?"
+- "What biocompatibility testing is required for implantable devices?"
+- "What are the labeling requirements for Class II devices?"
 
