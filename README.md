@@ -136,7 +136,7 @@ The system will:
 
 * Preload document cache for faster performance
 * Verify search functionality
-* Launch the web interface at http://localhost:8501
+* Launch the web interface
 * Clean up cache on exit
 
 ## Document Collection
