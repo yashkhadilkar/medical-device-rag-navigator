@@ -161,7 +161,6 @@ Try asking questions like:
 - "How does the FDA regulate software as a medical device?"
 - "What biocompatibility testing is required for implantable devices?"
 - "What are the labeling requirements for Class II devices?"
-- 
 
 ## Contributing
 Contributions are welcome!
