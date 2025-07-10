@@ -77,6 +77,57 @@ For the Industry:
 ## System Flow
 ![Demo](assets/SystemFlow.png)
 
+
+## Prerequisites and Quick Start
+
+### Prerequisites
+- Python 3.8 or higher
+- OpenAI API key (recommended)
+- 4GB+ RAM (for embedding models)
+- 1GB disk space (for document cache)
+
+### Quick Start
+#### 1. Clone and Setup
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/medical-device-rag-navigator.git
+cd medical-device-rag-navigator
+```
+
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+```
+#### 2. Configure API Keys
+⚠️ Important: Never share your API keys publicly!
+```bash
+export OPENAI_API_KEY="your-openai-api-key"
+export AWS_ACCESS_KEY_ID="your-aws-key"
+export AWS_SECRET_ACCESS_KEY="your-aws-secret"
+```
+Getting API Keys:
+* OpenAI: Visit [OpenAI Platform API](https://platform.openai.com/api-keys) 
+* AWS: Visit [AWS IAM Console](https://aws.amazon.com/getting-started/onboarding-to-aws/?trk=e7079eff-eca9-4924-a252-aeeddd3565a1&sc_channel=ps&ef_id=CjwKCAjwyb3DBhBlEiwAqZLe5ItFIspXxfpnkp1Fgf0dsuINA9ha674Is0Kec6jfe0ByqpaWbMvouBoC6VQQAvD_BwE:G:s&s_kwcid=AL!4422!3!733753180489!e!!g!!aws%20management%20console!22264826617!183710503348&gad_campaignid=22264826617&gbraid=0AAAAADjHtp9LjdL3QeJJ5EmS5Z9GDbNPy&gclid=CjwKCAjwyb3DBhBlEiwAqZLe5ItFIspXxfpnkp1Fgf0dsuINA9ha674Is0Kec6jfe0ByqpaWbMvouBoC6VQQAvD_BwE)
+
+#### 3. Launch the Application
+```bash
+# Start the application with cache preloading
+python launch_with_cache.py
+```
+
+The system will:
+
+* Preload document cache for faster performance
+* Verify search functionality
+* Launch the web interface at http://localhost:8501
+* Clean up cache on exit
+
 ## Document Collection
 | ***Current Categories***| ***Examples*** |
 | :---         |     :---:      | 
