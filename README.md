@@ -141,7 +141,6 @@ The system will:
 1. Upload PDFs to your AWS S3 bucket with organized folder structure
 2. Run cache regeneration: python launch_with_cache.py
 3. System automatically processes new documents
-4. 
 
 
 ## Example Queries
