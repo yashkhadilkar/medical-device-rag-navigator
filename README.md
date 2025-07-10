@@ -47,7 +47,7 @@ Medical device professionals face significant challenges when navigating FDA reg
 ## Solution
 
 This RAG-powered system solves these problems by:
-- Instant Access: Search through 30+ FDA guidance documents and regulations in seconds, not hours
+- Instant Access: Search through multiple FDA guidance documents and regulations in seconds, not hours
 - Clear Answers: Converts complex regulatory language into clear, actionable guidance
 - Source Citations: Every answer includes references to specific FDA documents and sections
 - Always Current: Can be updated with new guidance documents as they're published
