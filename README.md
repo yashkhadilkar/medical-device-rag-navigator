@@ -161,7 +161,7 @@ Contributions are welcome!
 5. Submit pull request
 
 #### Areas for contribution:
-* More documents in the S3 bucket. 
+* More documents in the S3 bucket
 * Performance optimizations
-* Adding URL scraping
+* Incorporating the existing URL scraping code into the URL
 
