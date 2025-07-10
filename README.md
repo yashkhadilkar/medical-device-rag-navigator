@@ -173,4 +173,4 @@ Contributions are welcome!
 ## Support
 Contact: yashkhadilkar04@gmail.com
 
-Empowering medical device professionals with AI-driven regulatory intelligence ❤️.
+##### Empowering medical device professionals with AI-driven regulatory intelligence ❤️.
