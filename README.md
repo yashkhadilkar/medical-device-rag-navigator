@@ -165,3 +165,12 @@ Contributions are welcome!
 * Performance optimizations
 * Incorporating the existing URL scraping code into the URL
 
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
+## Support
+Contact: yashkhadilkar04@gmail.com
+
+Empowering medical device professionals with AI-driven regulatory intelligence ❤️.
