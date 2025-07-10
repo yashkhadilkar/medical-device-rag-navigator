@@ -102,7 +102,7 @@ def main():
         result = subprocess.run([
             sys.executable, "-m", "streamlit", "run", 
             "interfaces/gui/app.py",
-            "--server.port", "8501",
+            "--server.port", "enter_your_server_port",
             "--browser.serverAddress", "localhost"
         ])
         
