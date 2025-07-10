@@ -14,7 +14,7 @@ An AI-powered system that helps navigate FDA medical device regulations using Re
 
 ## Features
 
-- Smart Document Search: Finds relevant information from 30+ FDA guidance documents and regulations
+- Smart Document Search: Finds relevant information from multiple FDA guidance documents and regulations
 - AI-Powered Answers: Generates accurate responses in 2-10 seconds based on official regulatory sources
 - Interactive Interface: Clean web interface for asking regulatory questions
 - Cost-Optimized: Designed to minimize API costs while maintaining quality
@@ -82,7 +82,7 @@ For the Industry:
 | Infrastructure  | Python 3.8, OpenAI API Key, AWS Account, Virtual Environment   | Runtime environment, dependency management, security   |
 
 
-| ***Performance*** | 30+ Documents, <3s Response,  60% Cache Hit, $0.01-0.15 per Query|
+| ***Performance*** | <10s Response,  60% Cache Hit, $0.01-0.15 per Query|
 | ------------- | ------------- |
 
 ## System Flow
