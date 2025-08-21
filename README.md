@@ -3,6 +3,7 @@
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/)
 ![Amazon S3](https://img.shields.io/badge/Amazon%20S3-FF9900?style=for-the-badge&logo=amazons3&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
+![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=000)
 
 
 An AI-powered system that helps navigate FDA medical device regulations using Retrieval-Augmented Generation (RAG). Get expert answers about device classification, 510(k) submissions, compliance requirements, and more - all sourced from official regulatory documents. [Check out the system on Streamlit.](https://medical-device-rag-navigator.streamlit.app/)
