@@ -29,6 +29,7 @@ An AI-powered system that helps navigate FDA medical device regulations using Re
 - [Impact](#impact)
 - [ Tech Stack](#tech-stack)
 - [System Flow](#system-flow)
+- [Training & Validation](#training-&-validation)
 - [Prerequisites and Quick Start](#prerequisites-and-quick-start)
 - [Document Collection](#document-collection)
 - [Example Queries](#example-queries)
@@ -89,6 +90,12 @@ For the Industry:
 ## System Flow
 ![Demo](assets/SystemFlow.png)
 
+## Training & Validation
+### System Architecture & Training Approach
+This project uses a Retrieval-Augmented Generation (RAG) architecture, which means:
+- No custom model training required - leverages pre-trained models (GPT-4, HuggingFace embeddings)
+- Knowledge comes from documents, not model parameters
+- Answers are grounded in source material, reducing hallucination risk
 
 ## Prerequisites and Quick Start
 
