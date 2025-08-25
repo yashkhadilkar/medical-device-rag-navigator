@@ -1,0 +1,428 @@
+{
+  "validation_test_set": {
+    "description": "50 test questions for Medical Device RAG system validation",
+    "categories": {
+      "device_classification": 10,
+      "510k_submissions": 10,
+      "software_samd": 10,
+      "compliance_qsr": 10,
+      "testing_requirements": 10
+    },
+    "questions": [
+      {
+        "id": 1,
+        "category": "device_classification",
+        "question": "What class is a blood glucose monitor?",
+        "expected_answer": "Class II medical device",
+        "key_points": ["Class II", "moderate risk", "510(k) required", "special controls"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 2,
+        "category": "device_classification", 
+        "question": "How are medical devices classified by the FDA?",
+        "expected_answer": "Three classes based on risk: Class I (low), Class II (moderate), Class III (high)",
+        "key_points": ["Class I, II, III", "risk-based", "controls required"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 3,
+        "category": "device_classification",
+        "question": "What is the difference between Class I and Class II devices?",
+        "expected_answer": "Class I: low risk, general controls only; Class II: moderate risk, special controls required",
+        "key_points": ["risk level", "general controls", "special controls", "510(k) requirements"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 4,
+        "category": "device_classification",
+        "question": "What class is a pacemaker?",
+        "expected_answer": "Class III medical device",
+        "key_points": ["Class III", "high risk", "life-sustaining", "PMA required"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 5,
+        "category": "device_classification",
+        "question": "Are surgical gloves Class I or Class II devices?",
+        "expected_answer": "Class I medical device",
+        "key_points": ["Class I", "low risk", "general controls", "may be 510(k) exempt"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 6,
+        "category": "device_classification",
+        "question": "What determines if a device needs special controls?",
+        "expected_answer": "Class II devices require special controls to ensure safety and effectiveness",
+        "key_points": ["Class II", "special controls", "safety and effectiveness", "guidance documents"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 7,
+        "category": "device_classification",
+        "question": "How can I find the classification of my medical device?",
+        "expected_answer": "Check FDA device database, product codes, or submit classification request",
+        "key_points": ["FDA database", "product codes", "classification request", "predicate devices"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 8,
+        "category": "device_classification",
+        "question": "What class is an insulin pump?",
+        "expected_answer": "Class II medical device",
+        "key_points": ["Class II", "moderate risk", "special controls", "510(k) typically required"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 9,
+        "category": "device_classification",
+        "question": "Can device classification change over time?",
+        "expected_answer": "Yes, FDA can reclassify devices based on new data or regulatory changes",
+        "key_points": ["reclassification", "new data", "regulatory updates", "risk assessment"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 10,
+        "category": "device_classification",
+        "question": "What are general controls for medical devices?",
+        "expected_answer": "Basic regulatory requirements: registration, listing, labeling, QSR compliance",
+        "key_points": ["registration", "listing", "labeling", "QSR", "all device classes"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 11,
+        "category": "510k_submissions",
+        "question": "What is a 510(k) submission?",
+        "expected_answer": "Premarket notification to FDA demonstrating substantial equivalence to predicate device",
+        "key_points": ["premarket notification", "substantial equivalence", "predicate device", "Class II"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 12,
+        "category": "510k_submissions",
+        "question": "What documents are required for a 510(k) submission?",
+        "expected_answer": "Device description, intended use, substantial equivalence comparison, performance data, labeling",
+        "key_points": ["device description", "intended use", "substantial equivalence", "performance data", "labeling"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 13,
+        "category": "510k_submissions",
+        "question": "How long does FDA take to review a 510(k)?",
+        "expected_answer": "FDA has 90 days to review, but may request additional information extending timeline",
+        "key_points": ["90 days", "additional information", "interactive review", "clock stops"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 14,
+        "category": "510k_submissions",
+        "question": "What is substantial equivalence in 510(k) submissions?",
+        "expected_answer": "Device has same intended use and technological characteristics as legally marketed predicate",
+        "key_points": ["same intended use", "technological characteristics", "predicate device", "safety and effectiveness"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 15,
+        "category": "510k_submissions",
+        "question": "When is a 510(k) submission required?",
+        "expected_answer": "For most Class II devices and some Class I devices before marketing",
+        "key_points": ["Class II devices", "some Class I", "before marketing", "not exempt"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 16,
+        "category": "510k_submissions",
+        "question": "What is the difference between Traditional, Special, and Abbreviated 510(k)s?",
+        "expected_answer": "Traditional: full submission; Special: modifications to own device; Abbreviated: uses guidance/standards",
+        "key_points": ["Traditional", "Special", "Abbreviated", "modifications", "guidance documents"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 17,
+        "category": "510k_submissions",
+        "question": "Can I market my device before 510(k) clearance?",
+        "expected_answer": "No, must receive FDA clearance before commercial distribution",
+        "key_points": ["FDA clearance required", "before marketing", "commercial distribution", "illegal without clearance"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 18,
+        "category": "510k_submissions",
+        "question": "What is a predicate device?",
+        "expected_answer": "Legally marketed device used for comparison in substantial equivalence determination",
+        "key_points": ["legally marketed", "comparison device", "substantial equivalence", "same intended use"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 19,
+        "category": "510k_submissions",
+        "question": "What happens if my 510(k) is rejected?",
+        "expected_answer": "Can address FDA concerns and resubmit, or request supervisory review",
+        "key_points": ["address concerns", "resubmit", "supervisory review", "additional data"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 20,
+        "category": "510k_submissions",
+        "question": "Do I need clinical data for my 510(k)?",
+        "expected_answer": "Depends on device and predicate comparison; may need clinical or performance testing",
+        "key_points": ["depends on device", "predicate comparison", "clinical testing", "performance data"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 21,
+        "category": "software_samd",
+        "question": "What is Software as a Medical Device (SaMD)?",
+        "expected_answer": "Software intended for medical purposes that can run on general computing platforms",
+        "key_points": ["medical purposes", "general computing platforms", "standalone software", "not part of hardware"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 22,
+        "category": "software_samd",
+        "question": "How does FDA regulate mobile medical apps?",
+        "expected_answer": "Based on intended use and risk; low-risk apps may be exempt, others need 510(k) or PMA",
+        "key_points": ["intended use", "risk-based", "exempt", "510(k)", "PMA"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 23,
+        "category": "software_samd",
+        "question": "What is the difference between SaMD and Software in Medical Device (SiMD)?",
+        "expected_answer": "SaMD is standalone software; SiMD is software that is part of a medical device",
+        "key_points": ["standalone software", "part of device", "SaMD", "SiMD", "different regulations"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 24,
+        "category": "software_samd",
+        "question": "Are AI/ML algorithms considered medical devices?",
+        "expected_answer": "Yes, if intended for medical purposes, AI/ML software are regulated as medical devices",
+        "key_points": ["medical purposes", "AI/ML", "regulated as devices", "special considerations"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 25,
+        "category": "software_samd",
+        "question": "What documentation is needed for software medical devices?",
+        "expected_answer": "Software documentation, risk management, validation/verification, cybersecurity information",
+        "key_points": ["software documentation", "risk management", "validation", "verification", "cybersecurity"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 26,
+        "category": "software_samd",
+        "question": "Do fitness apps need FDA approval?",
+        "expected_answer": "Most fitness apps are low-risk and exempt, unless they diagnose or treat medical conditions",
+        "key_points": ["fitness apps", "low-risk", "exempt", "diagnose", "treat", "medical conditions"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 27,
+        "category": "software_samd",
+        "question": "What are cybersecurity requirements for medical device software?",
+        "expected_answer": "Must address cybersecurity risks in design, include security controls, and have update plans",
+        "key_points": ["cybersecurity risks", "security controls", "update plans", "threat modeling"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 28,
+        "category": "software_samd",
+        "question": "How is clinical decision support software regulated?",
+        "expected_answer": "Depends on level of intervention; high-risk CDS needs FDA review, low-risk may be exempt",
+        "key_points": ["clinical decision support", "level of intervention", "high-risk", "low-risk", "exempt"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 29,
+        "category": "software_samd",
+        "question": "Can software medical devices be updated after FDA clearance?",
+        "expected_answer": "Minor updates may not need new submission; major changes require new 510(k) or supplement",
+        "key_points": ["software updates", "minor changes", "major changes", "new submission", "supplement"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 30,
+        "category": "software_samd",
+        "question": "What standards apply to medical device software?",
+        "expected_answer": "IEC 62304 for software lifecycle, ISO 14971 for risk management, plus cybersecurity standards",
+        "key_points": ["IEC 62304", "software lifecycle", "ISO 14971", "risk management", "cybersecurity standards"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 31,
+        "category": "compliance_qsr",
+        "question": "What is the Quality System Regulation (QSR)?",
+        "expected_answer": "FDA regulation (21 CFR 820) establishing quality system requirements for medical device manufacturers",
+        "key_points": ["21 CFR 820", "quality system", "device manufacturers", "GMP", "design controls"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 32,
+        "category": "compliance_qsr",
+        "question": "What are design controls?",
+        "expected_answer": "QSR requirements for device design including planning, input, output, review, verification, validation",
+        "key_points": ["design planning", "design input", "design output", "design review", "verification", "validation"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 33,
+        "category": "compliance_qsr",
+        "question": "What is CAPA in medical device quality systems?",
+        "expected_answer": "Corrective and Preventive Action system to identify and eliminate causes of nonconformities",
+        "key_points": ["Corrective Action", "Preventive Action", "nonconformities", "root cause", "eliminate causes"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 34,
+        "category": "compliance_qsr",
+        "question": "What is Medical Device Reporting (MDR)?",
+        "expected_answer": "Requirement to report device malfunctions, serious injuries, and deaths to FDA",
+        "key_points": ["device malfunctions", "serious injuries", "deaths", "FDA reporting", "21 CFR 803"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 35,
+        "category": "compliance_qsr",
+        "question": "What companies need to follow QSR?",
+        "expected_answer": "Manufacturers of Class II and III devices, and some Class I device manufacturers",
+        "key_points": ["Class II devices", "Class III devices", "some Class I", "manufacturers", "finished devices"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 36,
+        "category": "compliance_qsr",
+        "question": "What is UDI (Unique Device Identification)?",
+        "expected_answer": "System requiring unique identifiers on medical device labels and packaging for traceability",
+        "key_points": ["unique identifiers", "device labels", "packaging", "traceability", "GUDID database"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 37,
+        "category": "compliance_qsr",
+        "question": "How often should internal audits be conducted?",
+        "expected_answer": "QSR requires planned intervals based on importance and previous audit results, typically annually",
+        "key_points": ["planned intervals", "importance", "previous results", "annually", "quality system"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 38,
+        "category": "compliance_qsr",
+        "question": "What records must be maintained under QSR?",
+        "expected_answer": "Device master record, device history record, complaint files, and other quality records",
+        "key_points": ["device master record", "device history record", "complaint files", "quality records"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 39,
+        "category": "compliance_qsr",
+        "question": "What is management responsibility under QSR?",
+        "expected_answer": "Top management must establish quality policy, ensure resource availability, and review system effectiveness",
+        "key_points": ["quality policy", "resource availability", "management review", "system effectiveness"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 40,
+        "category": "compliance_qsr",
+        "question": "When are design controls required?",
+        "expected_answer": "Required for Class II and III devices, and Class I devices specifically subject to design controls",
+        "key_points": ["Class II devices", "Class III devices", "specific Class I", "design controls required"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 41,
+        "category": "testing_requirements",
+        "question": "What is biocompatibility testing?",
+        "expected_answer": "Testing to evaluate biological safety of medical devices in contact with human body",
+        "key_points": ["biological safety", "human body contact", "ISO 10993", "biological evaluation"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 42,
+        "category": "testing_requirements",
+        "question": "When is biocompatibility testing required?",
+        "expected_answer": "For devices with direct or indirect patient contact, following ISO 10993-1 guidance",
+        "key_points": ["patient contact", "direct contact", "indirect contact", "ISO 10993-1"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 43,
+        "category": "testing_requirements",
+        "question": "What is ISO 14971?",
+        "expected_answer": "International standard for application of risk management to medical devices",
+        "key_points": ["risk management", "medical devices", "international standard", "risk analysis"],
+        "difficulty": "easy"
+      },
+      {
+        "id": 44,
+        "category": "testing_requirements",
+        "question": "What electrical safety testing is required for medical devices?",
+        "expected_answer": "IEC 60601 series standards for medical electrical equipment safety and performance",
+        "key_points": ["IEC 60601", "electrical safety", "medical electrical equipment", "safety standards"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 45,
+        "category": "testing_requirements",
+        "question": "What is sterilization validation?",
+        "expected_answer": "Process to demonstrate sterilization method effectively eliminates microorganisms",
+        "key_points": ["sterilization method", "eliminate microorganisms", "validation process", "sterile devices"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 46,
+        "category": "testing_requirements",
+        "question": "Are clinical trials required for all medical devices?",
+        "expected_answer": "No, depends on device risk and available predicate data; Class III typically requires clinical data",
+        "key_points": ["depends on risk", "predicate data", "Class III", "clinical data", "not all devices"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 47,
+        "category": "testing_requirements",
+        "question": "What is electromagnetic compatibility (EMC) testing?",
+        "expected_answer": "Testing to ensure device doesn't interfere with other equipment and isn't affected by interference",
+        "key_points": ["electromagnetic compatibility", "interference", "other equipment", "EMC standards"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 48,
+        "category": "testing_requirements",
+        "question": "What is shelf life testing for medical devices?",
+        "expected_answer": "Testing to determine how long device maintains safety and effectiveness under storage conditions",
+        "key_points": ["shelf life", "safety", "effectiveness", "storage conditions", "aging studies"],
+        "difficulty": "medium"
+      },
+      {
+        "id": 49,
+        "category": "testing_requirements",
+        "question": "What is usability testing for medical devices?",
+        "expected_answer": "Human factors testing to ensure safe and effective use by intended users",
+        "key_points": ["human factors", "safe use", "effective use", "intended users", "use-related risks"],
+        "difficulty": "hard"
+      },
+      {
+        "id": 50,
+        "category": "testing_requirements",
+        "question": "What consensus standards should I consider for my medical device?",
+        "expected_answer": "Depends on device type; common ones include ISO 13485, ISO 14971, IEC 60601, ISO 10993",
+        "key_points": ["device-specific", "ISO 13485", "ISO 14971", "IEC 60601", "ISO 10993", "consensus standards"],
+        "difficulty": "hard"
+      }
+    ],
+    "metadata": {
+      "total_questions": 50,
+      "difficulty_distribution": {
+        "easy": 12,
+        "medium": 23, 
+        "hard": 15
+      },
+      "usage_instructions": "Run these questions through your RAG system and compare responses to expected answers and key points for validation.",
+      "scoring_criteria": {
+        "correct": "Answer contains all key points and aligns with expected answer",
+        "partial": "Answer contains some key points but missing important information", 
+        "incorrect": "Answer contradicts expected answer or contains significant errors"
+      }
+    }
+  }
+}
