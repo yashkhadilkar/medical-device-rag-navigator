@@ -81,7 +81,7 @@ For the Industry:
 | Text Processing    | NLTK, Query Processor, Medical Terminology       | Clean text, enhance queries, handle medical device terms     |
 | Document Processing   | pdfplumber, Text Chunking, Metadata Extraction   | Extract and structure content from FDA PDF documents    |
 | Data Storage    | AWS S3, Local Cache      | Store PDFs, vectors, and cached responses efficiently   |
-| Infrastructure  | Python 3.8, OpenAI API Key, AWS Account, Virtual Environment   | Runtime environment, dependency management, security   |
+| Infrastructure  | Python 3.10, OpenAI API Key, AWS Account, Virtual Environment   | Runtime environment, dependency management, security   |
 
 
 | ***Performance*** | <10s Response,  60% Cache Hit, $0.01-0.15 per Query|
@@ -117,7 +117,7 @@ This project uses a Retrieval-Augmented Generation (RAG) architecture, which mea
 ## Prerequisites and Quick Start
 
 ### Prerequisites
-- Python 3.8 or higher
+- Python 3.10 or higher
 - OpenAI API key (recommended)
 - 4GB+ RAM (for embedding models)
 - 1GB disk space (for document cache)
